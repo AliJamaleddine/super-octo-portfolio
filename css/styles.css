@@ -310,28 +310,121 @@ html.lenis, html.lenis body {
 }
 
 /* ============================================
-   MAIN / GALLERY
+   MAIN CONTENT AREA
    ============================================ */
 .main {
   margin-left: var(--sidebar-width);
   flex: 1;
-  padding: 2.5rem 2.5rem 4rem;
   min-height: 100vh;
+  position: relative;
 }
 
-/* CSS Grid masonry — row spans calculated by JS based on natural image ratios */
+/* ============================================
+   HORIZONTAL SLIDESHOW (All Work)
+   ============================================ */
+.slideshow {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slideshow__track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 32px;
+  will-change: transform;
+}
+
+.slideshow__slide {
+  flex: 0 0 auto;
+  width: min(55vw, 900px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s, transform 0.5s var(--ease-out-expo);
+  opacity: 0.4;
+  transform: scale(0.92);
+}
+
+.slideshow__slide--active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.slideshow__img-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--bg-surface);
+  line-height: 0;
+  width: 100%;
+}
+
+.slideshow__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  max-height: 75vh;
+}
+
+.slideshow__caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 100%;
+  padding: 0.8rem 0 0;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.slideshow__slide--active .slideshow__caption {
+  opacity: 1;
+}
+
+.slideshow__caption-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.slideshow__caption-author {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.slideshow__counter {
+  position: absolute;
+  bottom: 2rem;
+  right: 2.5rem;
+  z-index: 5;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================
+   MASONRY GALLERY GRID (Category views)
+   ============================================ */
 .gallery {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: 4px;
   gap: 0 1.5rem;
+  padding: 2.5rem 2.5rem 4rem;
 }
 
 .gallery__item {
   position: relative;
   opacity: 0;
   transform: translateY(40px);
-  margin-bottom: 0;
 }
 
 .gallery__item.revealed {
@@ -410,29 +503,11 @@ html.lenis, html.lenis body {
   100% { transform: scaleY(0); transform-origin: top; }
 }
 
-/* Gallery transition states */
-.gallery--fading {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.35s, transform 0.35s var(--ease-out-expo);
-}
-
-.gallery--entering {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.gallery--visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.45s 0.05s, transform 0.45s 0.05s var(--ease-out-expo);
-}
-
 /* ============================================
    ABOUT SECTION
    ============================================ */
 .about {
-  padding: 4rem 0;
+  padding: 4rem 2.5rem;
   max-width: 600px;
 }
 
@@ -637,8 +712,6 @@ html.lenis, html.lenis body {
   }
 }
 
-/* Standard desktop — 4 columns (default above) */
-
 /* Small desktop / large tablet — 3 columns */
 @media (max-width: 1200px) {
   .gallery {
@@ -650,10 +723,11 @@ html.lenis, html.lenis body {
 @media (max-width: 1024px) {
   .gallery {
     grid-template-columns: repeat(2, 1fr);
+    padding: 2rem 1.5rem 3rem;
   }
 
-  .main {
-    padding: 2rem 1.5rem 3rem;
+  .slideshow__slide {
+    width: 70vw;
   }
 }
 
@@ -721,22 +795,42 @@ html.lenis, html.lenis body {
 
   .main {
     margin-left: 0;
-    padding: 4.5rem 1rem 3rem;
   }
 
+  /* Slideshow mobile */
+  .slideshow__track {
+    gap: 16px;
+  }
+
+  .slideshow__slide {
+    width: 85vw;
+  }
+
+  .slideshow__counter {
+    right: 1rem;
+    bottom: 1.5rem;
+  }
+
+  /* Gallery mobile */
   .gallery {
     grid-template-columns: 1fr;
     grid-auto-rows: auto;
     gap: 2rem 0;
+    padding: 4.5rem 1rem 3rem;
   }
 
   .gallery__item {
-    grid-row-span: unset !important;
+    grid-row-end: auto !important;
   }
 
   .gallery__caption {
     opacity: 1;
     transform: none;
+  }
+
+  /* About mobile */
+  .about {
+    padding: 4.5rem 1rem 3rem;
   }
 
   /* Viewer mobile adjustments */

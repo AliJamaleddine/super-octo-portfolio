@@ -19,13 +19,72 @@
       touchMultiplier: 2,
     });
 
-    // Connect Lenis to GSAP ScrollTrigger
     lenis.on('scroll', ScrollTrigger.update);
 
     gsap.ticker.add(function (time) {
       lenis.raf(time * 1000);
     });
     gsap.ticker.lagSmoothing(0);
+  }
+
+  // ============================================
+  // INTRO VIDEO SOUND — fade in on interaction
+  // ============================================
+
+  function initVideoSound() {
+    var video = document.getElementById('loader-video');
+    if (!video) return;
+
+    // Try autoplay with sound first
+    video.muted = false;
+    video.volume = 0;
+    var playPromise = video.play();
+
+    if (playPromise !== undefined) {
+      playPromise.then(function () {
+        // Autoplay with sound succeeded — fade volume in
+        fadeVolumeIn(video);
+      }).catch(function () {
+        // Autoplay with sound blocked — start muted, unmute on interaction
+        video.muted = true;
+        video.volume = 0;
+        video.play();
+
+        var unmute = function () {
+          video.muted = false;
+          video.volume = 0;
+          fadeVolumeIn(video);
+          document.removeEventListener('click', unmute);
+          document.removeEventListener('scroll', unmute);
+          document.removeEventListener('touchstart', unmute);
+          document.removeEventListener('wheel', unmute);
+        };
+
+        document.addEventListener('click', unmute, { once: false });
+        document.addEventListener('scroll', unmute, { once: false });
+        document.addEventListener('touchstart', unmute, { once: false });
+        document.addEventListener('wheel', unmute, { once: false });
+      });
+    }
+  }
+
+  function fadeVolumeIn(video) {
+    var target = 0.35;  // subtle background volume
+    var duration = 1500; // 1.5 seconds
+    var steps = 30;
+    var stepTime = duration / steps;
+    var increment = target / steps;
+    var current = 0;
+
+    var interval = setInterval(function () {
+      current += increment;
+      if (current >= target) {
+        video.volume = target;
+        clearInterval(interval);
+      } else {
+        video.volume = current;
+      }
+    }, stepTime);
   }
 
   // --- Loading Screen Animation ---
@@ -75,6 +134,14 @@
     loader.style.pointerEvents = 'none';
     loader.style.display = 'none';
 
+    // Fade out video audio
+    var video = document.getElementById('loader-video');
+    if (video) {
+      gsap.to(video, { volume: 0, duration: 0.5, onComplete: function () {
+        video.pause();
+      }});
+    }
+
     var site = document.getElementById('site');
     gsap.to(site, {
       opacity: 1,
@@ -82,7 +149,7 @@
       ease: 'power2.out',
       onComplete: function () {
         if (window.TumbuktuGallery) {
-          window.TumbuktuGallery.layoutMasonry();
+          window.TumbuktuGallery.enableSlideshow();
         }
         revealGalleryItems(true);
         initScrollReveals();
@@ -169,38 +236,35 @@
   // --- Page Transition (category switch) ---
   window.TumbuktuAnimations = {
     transitionGallery: function (callback) {
-      var gallery = document.getElementById('gallery');
-      gallery.classList.add('gallery--fading');
+      var main = document.querySelector('.main');
+      gsap.to(main, {
+        opacity: 0,
+        y: 20,
+        duration: 0.35,
+        ease: 'power2.in',
+        onComplete: function () {
+          if (callback) callback();
 
-      setTimeout(function () {
-        if (callback) callback();
-
-        gallery.classList.remove('gallery--fading');
-        gallery.classList.add('gallery--entering');
-
-        // Force reflow
-        void gallery.offsetHeight;
-
-        gallery.classList.remove('gallery--entering');
-        gallery.classList.add('gallery--visible');
-
-        // Reveal new items and recalculate masonry
-        setTimeout(function () {
-          if (window.TumbuktuGallery) {
-            window.TumbuktuGallery.layoutMasonry();
-          }
-          revealGalleryItems(false);
-          initScrollReveals();
-          ScrollTrigger.refresh();
-          if (window.TumbuktuCursor) {
-            window.TumbuktuCursor.initMagnetic();
-          }
-        }, 50);
-
-        setTimeout(function () {
-          gallery.classList.remove('gallery--visible');
-        }, 600);
-      }, 380);
+          gsap.to(main, {
+            opacity: 1,
+            y: 0,
+            duration: 0.45,
+            delay: 0.05,
+            ease: 'power3.out',
+            onComplete: function () {
+              revealGalleryItems(false);
+              initScrollReveals();
+              ScrollTrigger.refresh();
+              if (window.TumbuktuGallery) {
+                window.TumbuktuGallery.layoutMasonry();
+              }
+              if (window.TumbuktuCursor) {
+                window.TumbuktuCursor.initMagnetic();
+              }
+            }
+          });
+        }
+      });
     }
   };
 
@@ -232,9 +296,7 @@
 
     overlay.addEventListener('click', closeMenu);
 
-    // Close on nav link click (mobile)
-    var navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(function (link) {
+    document.querySelectorAll('.nav-link').forEach(function (link) {
       link.addEventListener('click', function () {
         if (window.innerWidth <= 768) {
           closeMenu();
@@ -246,6 +308,7 @@
   // --- Init Everything ---
   document.addEventListener('DOMContentLoaded', function () {
     initLenis();
+    initVideoSound();
     playLoadingSequence();
     initNavPreview();
     initMobileMenu();
