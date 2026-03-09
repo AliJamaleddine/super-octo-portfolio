@@ -1,5 +1,5 @@
 /* ============================================
-   TUMBUKTU STUDIO — Gallery, Filtering & Viewer
+   TUMBUKTU STUDIO — Gallery, Masonry, Filtering & Viewer
    ============================================ */
 
 (function () {
@@ -21,14 +21,71 @@
   var viewerCurrent = document.getElementById('viewer-current');
   var viewerTotal = document.getElementById('viewer-total');
 
-  // Store original gallery HTML for filtering
   var allItems = [];
 
   function cacheItems() {
     allItems = Array.from(galleryEl.querySelectorAll('.gallery__item'));
   }
 
-  // --- Category Filtering ---
+  // ============================================
+  // MASONRY LAYOUT — Calculate grid-row span
+  // based on natural image aspect ratio
+  // ============================================
+
+  var ROW_HEIGHT = 4; // must match grid-auto-rows in CSS
+  var GAP = 24;       // vertical gap in px (1.5rem = 24px)
+
+  function layoutMasonry() {
+    // On mobile (single column) skip span calculations
+    if (window.innerWidth <= 768) return;
+
+    var items = galleryEl.querySelectorAll('.gallery__item');
+    items.forEach(function (item) {
+      if (item.style.display === 'none') return;
+
+      var img = item.querySelector('.gallery__img');
+      if (!img) return;
+
+      // Use naturalWidth/Height if loaded, otherwise wait
+      if (img.naturalWidth && img.naturalHeight) {
+        setRowSpan(item, img);
+      } else {
+        img.addEventListener('load', function () {
+          setRowSpan(item, img);
+        }, { once: true });
+      }
+    });
+  }
+
+  function setRowSpan(item, img) {
+    // Get the actual column width this item occupies
+    var colWidth = item.getBoundingClientRect().width;
+    if (colWidth === 0) return;
+
+    // Calculate the height the image will render at given column width
+    var ratio = img.naturalHeight / img.naturalWidth;
+    var imgHeight = colWidth * ratio;
+
+    // Add caption height (~28px)
+    var captionHeight = 28;
+    var totalHeight = imgHeight + captionHeight;
+
+    // Convert to row spans
+    var span = Math.ceil((totalHeight + GAP) / (ROW_HEIGHT + 0));
+    item.style.gridRowEnd = 'span ' + span;
+  }
+
+  // Recalculate on resize (debounced)
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(layoutMasonry, 150);
+  });
+
+  // ============================================
+  // CATEGORY FILTERING
+  // ============================================
+
   function filterCategory(category) {
     if (category === currentCategory) return;
     currentCategory = category;
@@ -44,7 +101,6 @@
       window.TumbuktuAnimations.transitionGallery(function () {
         galleryEl.style.display = 'none';
         aboutEl.style.display = 'block';
-        // Clear gallery items from viewer
         viewerItems = [];
       });
       return;
@@ -55,7 +111,6 @@
     galleryEl.style.display = '';
 
     window.TumbuktuAnimations.transitionGallery(function () {
-      // Show/hide items
       allItems.forEach(function (item) {
         var itemCat = item.getAttribute('data-category');
         if (category === 'all' || itemCat === category) {
@@ -68,7 +123,8 @@
         }
       });
 
-      // Update viewer items list
+      // Recalculate masonry after filter
+      requestAnimationFrame(layoutMasonry);
       updateViewerItems();
     });
   }
@@ -90,7 +146,6 @@
       filterCategory(cat);
     });
 
-    // Logo click -> show all
     var logo = document.querySelector('.sidebar__logo');
     if (logo) {
       logo.addEventListener('click', function (e) {
@@ -101,7 +156,7 @@
   }
 
   // ============================================
-  // FULLSCREEN VIEWER
+  // FULLSCREEN VIEWER — loads full-res via data-full
   // ============================================
 
   function openViewer(index) {
@@ -129,9 +184,9 @@
     var captionTitle = item.querySelector('.gallery__caption-title');
     var captionAuthor = item.querySelector('.gallery__caption-author');
 
-    // Use full-res image (replace w=800 with w=1600 for viewer)
-    var src = img.getAttribute('src').replace('w=800', 'w=1600');
-    viewerImg.setAttribute('src', src);
+    // Use data-full for full resolution; fall back to src
+    var fullSrc = img.getAttribute('data-full') || img.getAttribute('src');
+    viewerImg.setAttribute('src', fullSrc);
     viewerImg.setAttribute('alt', img.getAttribute('alt'));
     viewerCaptionTitle.textContent = captionTitle ? captionTitle.textContent : '';
     viewerCaptionAuthor.textContent = captionAuthor ? captionAuthor.textContent : '';
@@ -161,7 +216,6 @@
 
   // --- Viewer Event Listeners ---
   function initViewer() {
-    // Click image to open viewer
     galleryEl.addEventListener('click', function (e) {
       var imgWrap = e.target.closest('.gallery__img-wrap');
       if (!imgWrap) return;
@@ -174,13 +228,9 @@
       }
     });
 
-    // Close button
     viewer.querySelector('.viewer__close').addEventListener('click', closeViewer);
-
-    // Backdrop click
     viewer.querySelector('.viewer__backdrop').addEventListener('click', closeViewer);
 
-    // Arrows
     viewer.querySelector('.viewer__arrow--prev').addEventListener('click', function (e) {
       e.stopPropagation();
       prevImage();
@@ -199,32 +249,45 @@
       if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevImage();
     });
 
-    // Touch/swipe support for viewer
+    // Touch/swipe
     var touchStartX = 0;
-    var touchEndX = 0;
 
     viewer.addEventListener('touchstart', function (e) {
       touchStartX = e.changedTouches[0].screenX;
     }, { passive: true });
 
     viewer.addEventListener('touchend', function (e) {
-      touchEndX = e.changedTouches[0].screenX;
-      var diff = touchStartX - touchEndX;
+      var diff = touchStartX - e.changedTouches[0].screenX;
       if (Math.abs(diff) > 50) {
-        if (diff > 0) {
-          nextImage();
-        } else {
-          prevImage();
-        }
+        diff > 0 ? nextImage() : prevImage();
       }
     }, { passive: true });
   }
 
-  // --- Init ---
+  // ============================================
+  // INIT
+  // ============================================
+
+  // Expose layoutMasonry so animations.js can call it after transitions
+  window.TumbuktuGallery = {
+    layoutMasonry: layoutMasonry
+  };
+
   document.addEventListener('DOMContentLoaded', function () {
     cacheItems();
     updateViewerItems();
     initNavigation();
     initViewer();
+
+    // Initial masonry layout once images start loading
+    layoutMasonry();
+
+    // Re-layout as images finish loading (handles lazy-loaded images)
+    galleryEl.addEventListener('load', function (e) {
+      if (e.target.tagName === 'IMG') {
+        var item = e.target.closest('.gallery__item');
+        if (item) setRowSpan(item, e.target);
+      }
+    }, true);
   });
 })();

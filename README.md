@@ -20,14 +20,16 @@ tumbuktu-portfolio/
 │   └── cursor.js         # Custom cursor and magnetic image hover
 ├── media/
 │   ├── loading-video.mp4 # Fullscreen loading background video
-│   └── images/           # Portfolio images (local copies)
+│   ├── images/           # Full resolution images (loaded in viewer)
+│   └── thumbnails/       # Gallery thumbnails (~600–800px wide)
 └── README.md
 ```
 
 ## Features
 
 - **Cinematic loading screen** with background video and GSAP text reveal
-- **Masonry gallery grid** with CSS columns — responsive across all breakpoints
+- **Masonry gallery grid** with CSS Grid + JS row-span calculation — preserves natural aspect ratios
+- **Two-layer image system** — thumbnails in gallery, full-res loaded on viewer open
 - **Category filtering** with smooth fade/slide transitions (no page reloads)
 - **Fullscreen image viewer** with keyboard, arrow, swipe, and ESC navigation
 - **Custom cursor** with hover states and magnetic image pull effect
@@ -50,14 +52,16 @@ python3 -m http.server 8000
 
 ## Adding New Photos
 
-1. Add your image to `media/images/` (or use an external URL).
+1. Add your thumbnail to `media/thumbnails/` (recommended: ~600–800px wide).
+2. Add the full-resolution image to `media/images/` (recommended: ~2400px wide).
 
-2. In `index.html`, add a new gallery item inside `<div id="gallery">`:
+3. In `index.html`, add a new gallery item inside `<div id="gallery">`:
 
 ```html
 <div class="gallery__item" data-category="portraits">
   <div class="gallery__img-wrap">
-    <img src="media/images/your-photo.jpg"
+    <img src="media/thumbnails/your-photo-thumb.jpg"
+         data-full="media/images/your-photo-full.jpg"
          alt="Description"
          loading="lazy"
          class="gallery__img">
@@ -69,11 +73,13 @@ python3 -m http.server 8000
 </div>
 ```
 
-### Item variants
+### Image handling
 
-- Default: standard aspect ratio (determined by image)
-- `gallery__item--tall`: forces 2:3 portrait ratio
-- `gallery__item--wide`: forces 16:9 landscape ratio
+- The gallery uses **CSS Grid masonry** with JS-calculated row spans
+- Each image renders at its **natural aspect ratio** — no cropping
+- Landscape (3:2) photos appear wider, portrait photos appear taller
+- The `data-full` attribute specifies the full-resolution image loaded in the viewer
+- If `data-full` is omitted, the thumbnail `src` is used as fallback
 
 ## Adding New Categories
 

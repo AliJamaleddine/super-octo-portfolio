@@ -81,6 +81,9 @@
       duration: 0.6,
       ease: 'power2.out',
       onComplete: function () {
+        if (window.TumbuktuGallery) {
+          window.TumbuktuGallery.layoutMasonry();
+        }
         revealGalleryItems(true);
         initScrollReveals();
       }
@@ -181,8 +184,11 @@
         gallery.classList.remove('gallery--entering');
         gallery.classList.add('gallery--visible');
 
-        // Reveal new items
+        // Reveal new items and recalculate masonry
         setTimeout(function () {
+          if (window.TumbuktuGallery) {
+            window.TumbuktuGallery.layoutMasonry();
+          }
           revealGalleryItems(false);
           initScrollReveals();
           ScrollTrigger.refresh();
