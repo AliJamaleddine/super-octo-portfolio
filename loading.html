@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tumbuktu Studio — Loading</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    .video-wrap {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
+    .video-wrap video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.4;
+    }
+    .content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+    .title-main {
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      font-weight: 300;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+    }
+    .title-sub {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1rem, 2.5vw, 1.6rem);
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: 0.15em;
+      color: #d2a15f;
+      margin-top: 4px;
+    }
+    .tagline {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #bbb;
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="video-wrap">
+    <video autoplay muted loop playsinline>
+      <source src="media/loading-video.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="content">
+    <h1>
+      <span class="title-main">TUMBUKTU</span><br>
+      <span class="title-sub">Studio</span>
+    </h1>
+    <p class="tagline">Visual Stories</p>
+  </div>
+</body>
+</html>
