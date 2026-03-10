@@ -29,81 +29,43 @@ window.GALLERY_DATA = {
 
   portraits: [
     {
-      thumb:  'pics/000074650009.JPG',
-      full:   'pics/000074650009.JPG',
+      thumb:  'pics/IMG_4485.JPG',
+      full:   'pics/IMG_4485.JPG',
       alt:    'Portrait on film',
       title:  '2025',
-      author: 'Film I'
+      author: 'ASU frat leader'
     },
     {
-      thumb:  'pics/000074650013.JPG',
-      full:   'pics/000074650013.JPG',
+      thumb:  'pics/IMG_4681.JPG',
+      full:   'pics/IMG_4681.JPG',
       alt:    'Portrait on film',
       title:  '2025',
-      author: 'Film II'
+      author: 'randommf'
     },
     {
-      thumb:  'pics/000074650015.JPG',
-      full:   'pics/000074650015.JPG',
+      thumb:  'pics/IMG_2534.JPG',
+      full:   'pics/IMG_2534.JPG',
       alt:    'Portrait on film',
       title:  '2025',
-      author: 'Film III'
+      author: 'XZ'
     },
     {
-      thumb:  'pics/000074650016.JPG',
-      full:   'pics/000074650016.JPG',
+      thumb:  'pics/P7041626.JPG',
+      full:   'pics/P7041626.JPG',
       alt:    'Portrait on film',
       title:  '2025',
-      author: 'Film IV'
+      author: 'REDED'
     },
     {
-      thumb:  'pics/000074650024.JPG',
-      full:   'pics/000074650024.JPG',
+      thumb:  'pics/P7041623.JPG',
+      full:   'pics/P7041623.JPG',
       alt:    'Portrait on film',
       title:  '2025',
-      author: 'Film V'
-    },
-    {
-      thumb:  'pics/000074650025.JPG',
-      full:   'pics/000074650025.JPG',
-      alt:    'Portrait on film',
-      title:  '2025',
-      author: 'Film VI'
+      author: 'XZ'
     }
   ],
 
   travel: [
-    {
-      thumb:  'pics/000048220005.jpg',
-      full:   'pics/000048220005.jpg',
-      alt:    'Travel photograph',
-      title:  '2025',
-      author: 'Journey I'
-    },
-    {
-      thumb:  'pics/000048220010.jpg',
-      full:   'pics/000048220010.jpg',
-      alt:    'Travel photograph',
-      title:  '2025',
-      author: 'Journey II'
-    },
-    {
-      thumb:  'pics/000048220014.jpg',
-      full:   'pics/000048220014.jpg',
-      alt:    'Travel photograph',
-      title:  '2025',
-      author: 'Journey III'
-    },
-    {
-      thumb:  'pics/000048220036.jpg',
-      full:   'pics/000048220036.jpg',
-      alt:    'Travel photograph',
-      title:  '2025',
-      author: 'Journey IV'
-    }
-  ],
-
-  night: [
     {
       thumb:  'pics/000074660006.JPG',
       full:   'pics/000074660006.JPG',
@@ -131,10 +93,105 @@ window.GALLERY_DATA = {
       alt:    'Night photograph',
       title:  '2025',
       author: 'Night IV'
+    },
+    {
+      thumb:  'pics/000074650009.JPG',
+      full:   'pics/000074650009.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film I'
+    },
+    {
+      thumb:  'pics/000074650025.JPG',
+      full:   'pics/000074650025.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film VI'
+    },
+    {
+      thumb:  'pics/000074650024.JPG',
+      full:   'pics/000074650024.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film V'
+    },
+    {
+      thumb:  'pics/000074650015.JPG',
+      full:   'pics/000074650015.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film III'
+    }
+    /* 
+    {
+      thumb:  'pics/000048220014.jpg',
+      full:   'pics/000048220014.jpg',
+      alt:    'Travel photograph',
+      title:  '2025',
+      author: 'Journey III'
+    },
+    {
+      thumb:  'pics/000048220036.jpg',
+      full:   'pics/000048220036.jpg',
+      alt:    'Travel photograph',
+      title:  '2025',
+      author: 'Journey IV'
+    }*/
+  ],
+
+  night: [
+    {
+      thumb:  'pics/PC070295.JPG',
+      full:   'pics/PC070295.JPG',
+      alt:    'Night photograph',
+      title:  '2025',
+      author: 'Night I'
+    },
+    {
+      thumb:  'pics/000061030033.jpg',
+      full:   'pics/000061030033.jpg',
+      alt:    'Night photograph',
+      title:  '2025',
+      author: 'Night II'
+    },
+    {
+      thumb:  'pics/604A3662-D260-4EDD-BE75-18DF147750C3 2.JPG',
+      full:   'pics/604A3662-D260-4EDD-BE75-18DF147750C3 2.JPG',
+      alt:    'Night photograph',
+      title:  '2025',
+      author: 'Night III'
+    },
+    {
+      thumb:  'pics/000073510009.jpg',
+      full:   'pics/000073510009.jpg',
+      alt:    'Night photograph',
+      title:  '2025',
+      author: 'Night IV'
     }
   ],
 
   diary: [
+    {
+      thumb:  'pics/000048220010.jpg',
+      full:   'pics/000048220010.jpg',
+      alt:    'Travel photograph',
+      title:  '2025',
+      author: 'Journey II'
+    },
+    {
+      thumb:  'pics/000074650013.JPG',
+      full:   'pics/000074650013.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film II'
+    },
+    {
+      thumb:  'pics/000074650016.JPG',
+      full:   'pics/000074650016.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film IV'
+    },
     {
       thumb:  'pics/000061030033.jpg',
       full:   'pics/000061030033.jpg',
@@ -169,6 +226,13 @@ window.GALLERY_DATA = {
       alt:    'Diary moment',
       title:  '2025',
       author: 'Diary V'
+    },
+    {
+      thumb:  'pics/P7031101.JPG',
+      full:   'pics/P7031101.JPG',
+      alt:    'Diary moment',
+      title:  '2025',
+      author: 'Diary V'
     }
   ],
 
@@ -190,6 +254,15 @@ window.GALLERY_DATA = {
       alt:    'Video — Short film',
       title:  '2026',
       author: 'Short Film'
+    },
+    {
+      type:   'video',
+      src:    'pics/GX010291.MOV',
+      thumb:  'pics/000074650009.JPG',
+      full:   'pics/000074650009.JPG',
+      alt:    'Video — GoPro footage',
+      title:  '2025',
+      author: 'GoPro'
     }
   ]
 
