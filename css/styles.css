@@ -903,16 +903,14 @@ html.lenis, html.lenis body {
     margin-left: 0;
   }
 
-  /* Slideshow mobile — no scrollbar, touch-controlled */
+  /* Slideshow mobile — no scrollbar, no native scrolling, fully JS-controlled */
   .slideshow {
     overflow: hidden;
-    touch-action: pan-y;
-    -webkit-overflow-scrolling: auto;
+    touch-action: none;
   }
 
   .slideshow__track {
     gap: 12px;
-    overflow: visible;
   }
 
   .slideshow__slide {

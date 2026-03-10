@@ -265,12 +265,16 @@
     var toggle = document.getElementById('menu-toggle');
     var sidebar = document.getElementById('sidebar');
     var overlay = document.getElementById('mobile-overlay');
+    var savedScrollY = 0;
 
     function openMenu() {
+      // Save scroll position before locking body
+      savedScrollY = window.scrollY;
       toggle.classList.add('menu-toggle--active');
       sidebar.classList.add('sidebar--open');
       overlay.classList.add('mobile-overlay--visible');
       document.body.classList.add('menu-open');
+      document.body.style.top = '-' + savedScrollY + 'px';
     }
 
     function closeMenu() {
@@ -278,6 +282,9 @@
       sidebar.classList.remove('sidebar--open');
       overlay.classList.remove('mobile-overlay--visible');
       document.body.classList.remove('menu-open');
+      document.body.style.top = '';
+      // Restore scroll position
+      window.scrollTo(0, savedScrollY);
     }
 
     toggle.addEventListener('click', function () {

@@ -284,84 +284,46 @@
     }
   }
 
-  // --- Mobile: proper touch carousel with drag + snap ---
-  var touch = {
+  // --- Mobile: discrete swipe detection (no drag, just next/prev) ---
+  var mobileTouch = {
     startX: 0,
-    startY: 0,
-    currentX: 0,
-    isDragging: false,
-    isHorizontal: null,  // null = undecided, true = horizontal, false = vertical
     startTime: 0,
-    didSwipe: false
+    swiped: false
   };
 
-  function onTouchStart(e) {
+  function onMobileTouchStart(e) {
     if (!slideshowActive || isAnimating) return;
-    var t = e.changedTouches[0];
-    touch.startX = t.clientX;
-    touch.startY = t.clientY;
-    touch.currentX = t.clientX;
-    touch.isDragging = true;
-    touch.isHorizontal = null;
-    touch.startTime = Date.now();
-    touch.didSwipe = false;
-    trackEl.style.transition = 'none';
+    mobileTouch.startX = e.changedTouches[0].clientX;
+    mobileTouch.startTime = Date.now();
+    mobileTouch.swiped = false;
   }
 
-  function onTouchMove(e) {
-    if (!touch.isDragging) return;
-    var t = e.changedTouches[0];
-    var dx = t.clientX - touch.startX;
-    var dy = t.clientY - touch.startY;
+  function onMobileTouchMove(e) {
+    // Block all scrolling (vertical + horizontal) on the slideshow
+    if (slideshowActive) e.preventDefault();
+  }
 
-    // Determine direction on first significant movement
-    if (touch.isHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
-      touch.isHorizontal = Math.abs(dx) > Math.abs(dy);
-    }
+  function onMobileTouchEnd(e) {
+    if (!slideshowActive || isAnimating) return;
+    var dx = e.changedTouches[0].clientX - mobileTouch.startX;
+    var elapsed = Date.now() - mobileTouch.startTime;
+    var velocity = Math.abs(dx) / elapsed;
 
-    // If vertical scroll, let browser handle it
-    if (touch.isHorizontal === false) {
-      touch.isDragging = false;
-      return;
-    }
+    // Trigger next/prev on sufficient swipe distance OR quick flick
+    var threshold = 40;
+    var isFlick = velocity > 0.3 && Math.abs(dx) > 20;
 
-    // Horizontal: prevent scroll and drag the track
-    if (touch.isHorizontal) {
-      e.preventDefault();
-      touch.currentX = t.clientX;
-      var dragDelta = touch.currentX - touch.startX;
-      updateSlideshowPosition(false, dragDelta);
+    if (Math.abs(dx) > threshold || isFlick) {
+      mobileTouch.swiped = true;
+      if (dx < 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
     }
   }
 
-  function onTouchEnd(e) {
-    if (!touch.isDragging || touch.isHorizontal !== true) {
-      touch.isDragging = false;
-      return;
-    }
-    touch.isDragging = false;
-
-    var dx = touch.currentX - touch.startX;
-    var elapsed = Date.now() - touch.startTime;
-    var velocity = Math.abs(dx) / elapsed; // px per ms
-
-    // Determine whether to go next, prev, or snap back
-    var threshold = getSlidePixelWidth() * 0.2;
-    var isQuickFlick = velocity > 0.3 && Math.abs(dx) > 20;
-
-    if (dx < -threshold || (isQuickFlick && dx < 0)) {
-      touch.didSwipe = true;
-      nextSlide();
-    } else if (dx > threshold || (isQuickFlick && dx > 0)) {
-      touch.didSwipe = true;
-      prevSlide();
-    } else {
-      // Snap back to current
-      updateSlideshowPosition(true);
-    }
-  }
-
-  // Desktop: simple touch fallback (for trackpads etc on touch-capable desktops)
+  // Desktop: simple touch fallback (for trackpads on touch-capable desktops)
   var desktopTouchStartX = 0;
   function onDesktopTouchStart(e) {
     desktopTouchStartX = e.changedTouches[0].screenX;
@@ -383,10 +345,10 @@
     document.querySelector('.main').addEventListener('wheel', onSlideshowWheel, { passive: false });
 
     if (isMobile()) {
-      // Mobile: drag carousel
-      slideshowEl.addEventListener('touchstart', onTouchStart, { passive: true });
-      slideshowEl.addEventListener('touchmove', onTouchMove, { passive: false });
-      slideshowEl.addEventListener('touchend', onTouchEnd, { passive: true });
+      // Mobile: discrete swipe → next/prev (no drag, no scroll)
+      slideshowEl.addEventListener('touchstart', onMobileTouchStart, { passive: true });
+      slideshowEl.addEventListener('touchmove', onMobileTouchMove, { passive: false });
+      slideshowEl.addEventListener('touchend', onMobileTouchEnd, { passive: true });
     } else {
       // Desktop: simple swipe
       slideshowEl.addEventListener('touchstart', onDesktopTouchStart, { passive: true });
@@ -402,9 +364,9 @@
     document.querySelector('.main').removeEventListener('wheel', onSlideshowWheel);
 
     // Remove all touch listeners
-    slideshowEl.removeEventListener('touchstart', onTouchStart);
-    slideshowEl.removeEventListener('touchmove', onTouchMove);
-    slideshowEl.removeEventListener('touchend', onTouchEnd);
+    slideshowEl.removeEventListener('touchstart', onMobileTouchStart);
+    slideshowEl.removeEventListener('touchmove', onMobileTouchMove);
+    slideshowEl.removeEventListener('touchend', onMobileTouchEnd);
     slideshowEl.removeEventListener('touchstart', onDesktopTouchStart);
     slideshowEl.removeEventListener('touchend', onDesktopTouchEnd);
 
@@ -590,7 +552,7 @@
 
   function openViewerFromSlideshow(idx) {
     // On mobile, ignore taps that were actually swipes
-    if (isMobile() && touch.didSwipe) return;
+    if (isMobile() && mobileTouch.swiped) return;
     viewerItems = allImages;
     viewerIndex = idx;
     openViewer();
