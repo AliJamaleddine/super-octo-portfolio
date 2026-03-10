@@ -371,6 +371,60 @@ html.lenis, html.lenis body {
   max-height: 75vh;
 }
 
+/* Lazy loading fade-in */
+.slideshow__img[data-src],
+.gallery__img[data-src] {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.slideshow__img.loaded,
+.gallery__img.loaded {
+  opacity: 1;
+}
+
+/* Video overlays */
+.slideshow__video-wrap,
+.gallery__video-wrap {
+  position: relative;
+}
+
+.slideshow__play-icon,
+.gallery__play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.7;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+
+.slideshow__video-wrap:hover .slideshow__play-icon,
+.gallery__video-wrap:hover .gallery__play-icon {
+  opacity: 0;
+}
+
+.slideshow__video,
+.gallery__video {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  max-height: 75vh;
+  background: var(--bg-surface);
+}
+
+/* Viewer video */
+.viewer__video {
+  max-width: 85vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 2px;
+  background: #000;
+}
+
 .slideshow__caption {
   display: flex;
   justify-content: space-between;

@@ -2,6 +2,7 @@
    TUMBUKTU STUDIO — Gallery Engine
    Reads from window.GALLERY_DATA (gallery-data.js)
    Renders: infinite slideshow (All Work) + masonry grid (categories)
+   Supports: images and video items
    ============================================ */
 
 (function () {
@@ -21,7 +22,7 @@
   // --- State ---
   var currentCategory = 'all';
   var viewerOpen = false;
-  var viewerItems = [];   // array of { full, alt, title, author }
+  var viewerItems = [];   // array of { full, alt, title, author, type?, src? }
   var viewerIndex = 0;
 
   // --- DOM refs ---
@@ -33,10 +34,48 @@
   var aboutEl = document.getElementById('about-section');
   var viewer = document.getElementById('viewer');
   var viewerImg = document.getElementById('viewer-img');
+  var viewerVideo = document.getElementById('viewer-video');
   var viewerCaptionTitle = document.getElementById('viewer-caption-title');
   var viewerCaptionAuthor = document.getElementById('viewer-caption-author');
   var viewerCurrentEl = document.getElementById('viewer-current');
   var viewerTotalEl = document.getElementById('viewer-total');
+
+  // ============================================
+  // LAZY LOADING with IntersectionObserver
+  // ============================================
+
+  var lazyObserver;
+  if ('IntersectionObserver' in window) {
+    lazyObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          var el = entry.target;
+          if (el.dataset.src) {
+            el.src = el.dataset.src;
+            el.removeAttribute('data-src');
+            el.addEventListener('load', function () {
+              el.classList.add('loaded');
+            }, { once: true });
+          }
+          lazyObserver.unobserve(el);
+        }
+      });
+    }, {
+      rootMargin: '200px 0px'
+    });
+  }
+
+  function lazyLoad(imgEl) {
+    if (lazyObserver) {
+      lazyObserver.observe(imgEl);
+    } else {
+      // Fallback: load immediately
+      if (imgEl.dataset.src) {
+        imgEl.src = imgEl.dataset.src;
+        imgEl.removeAttribute('data-src');
+      }
+    }
+  }
 
   // ============================================
   // SLIDESHOW — Infinite horizontal for "All Work"
@@ -73,14 +112,32 @@
     el.className = 'slideshow__slide';
     el.setAttribute('data-idx', idx);
 
-    el.innerHTML =
-      '<div class="slideshow__img-wrap">' +
-        '<img src="' + img.thumb + '" data-full="' + img.full + '" alt="' + img.alt + '" class="slideshow__img" loading="lazy">' +
-      '</div>' +
-      '<div class="slideshow__caption">' +
-        '<span class="slideshow__caption-title">' + img.title + '</span>' +
-        '<span class="slideshow__caption-author">' + img.author + '</span>' +
-      '</div>';
+    var isVideo = img.type === 'video';
+
+    if (isVideo) {
+      el.innerHTML =
+        '<div class="slideshow__img-wrap slideshow__video-wrap">' +
+          '<video src="' + img.src + '" class="slideshow__img slideshow__video" muted loop playsinline preload="metadata"></video>' +
+          '<div class="slideshow__play-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div>' +
+        '</div>' +
+        '<div class="slideshow__caption">' +
+          '<span class="slideshow__caption-title">' + img.title + '</span>' +
+          '<span class="slideshow__caption-author">' + img.author + '</span>' +
+        '</div>';
+    } else {
+      el.innerHTML =
+        '<div class="slideshow__img-wrap">' +
+          '<img data-src="' + img.thumb + '" data-full="' + img.full + '" alt="' + img.alt + '" class="slideshow__img" decoding="async">' +
+        '</div>' +
+        '<div class="slideshow__caption">' +
+          '<span class="slideshow__caption-title">' + img.title + '</span>' +
+          '<span class="slideshow__caption-author">' + img.author + '</span>' +
+        '</div>';
+
+      // Lazy load the image
+      var imgEl = el.querySelector('.slideshow__img');
+      lazyLoad(imgEl);
+    }
 
     // Click to open viewer
     el.querySelector('.slideshow__img-wrap').addEventListener('click', function () {
@@ -92,11 +149,8 @@
   }
 
   function updateSlideshowPosition(animate) {
-    // Position so the current slide is centered
-    // Each slide is a vw-based width, calculated via CSS
-    var offset = (slideIndex + slideCount) ; // offset into the middle set
+    var offset = (slideIndex + slideCount);
     var translateX = -offset * getSlideWidth();
-    // Center the active slide
     var centering = (window.innerWidth - getSidebarWidth() - getSlidePixelWidth()) / 2;
 
     if (animate) {
@@ -106,11 +160,20 @@
     }
     trackEl.style.transform = 'translateX(' + (centering - offset * getSlidePixelWidth() - offset * getSlideGap()) + 'px)';
 
-    // Update active class for scale effect
     var slides = trackEl.querySelectorAll('.slideshow__slide');
     slides.forEach(function (s, i) {
-      var realI = i - slideCount; // relative to middle set
+      var realI = i - slideCount;
       s.classList.toggle('slideshow__slide--active', realI === slideIndex);
+
+      // Auto-play video when active in slideshow
+      var video = s.querySelector('video');
+      if (video) {
+        if (realI === slideIndex) {
+          video.play().catch(function () {});
+        } else {
+          video.pause();
+        }
+      }
     });
   }
 
@@ -136,9 +199,7 @@
     if (isAnimating) return;
     slideIndex = newIndex;
 
-    // Wrap around seamlessly
     if (slideIndex >= slideCount) {
-      // Jump to equivalent in first set after animation
       if (animate) {
         isAnimating = true;
         updateSlideshowPosition(true);
@@ -188,11 +249,10 @@
   }
 
   function preloadNearby() {
-    // Preload next 2 and previous 1 full-res images
     [-1, 1, 2].forEach(function (offset) {
       var idx = ((slideIndex + offset) % slideCount + slideCount) % slideCount;
       var img = allImages[idx];
-      if (img && img.full) {
+      if (img && img.full && img.type !== 'video') {
         var preload = new Image();
         preload.src = img.full;
       }
@@ -206,7 +266,6 @@
     if (!slideshowActive) return;
     e.preventDefault();
 
-    // Use deltaX or deltaY (whichever is larger)
     var delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
     wheelAccum += delta;
 
@@ -248,6 +307,9 @@
     document.querySelector('.main').removeEventListener('wheel', onSlideshowWheel);
     slideshowEl.removeEventListener('touchstart', onSlideshowTouchStart);
     slideshowEl.removeEventListener('touchend', onSlideshowTouchEnd);
+
+    // Pause all slideshow videos
+    trackEl.querySelectorAll('video').forEach(function (v) { v.pause(); });
   }
 
   // Resize handler
@@ -275,14 +337,44 @@
       var item = document.createElement('div');
       item.className = 'gallery__item';
       item.setAttribute('data-category', category);
-      item.innerHTML =
-        '<div class="gallery__img-wrap">' +
-          '<img src="' + img.thumb + '" data-full="' + img.full + '" alt="' + img.alt + '" loading="lazy" class="gallery__img">' +
-        '</div>' +
-        '<div class="gallery__caption">' +
-          '<span class="gallery__caption-title">' + img.title + '</span>' +
-          '<span class="gallery__caption-author">' + img.author + '</span>' +
-        '</div>';
+
+      var isVideo = img.type === 'video';
+
+      if (isVideo) {
+        item.innerHTML =
+          '<div class="gallery__img-wrap gallery__video-wrap">' +
+            '<video src="' + img.src + '" class="gallery__img gallery__video" muted loop playsinline preload="metadata"></video>' +
+            '<div class="gallery__play-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div>' +
+          '</div>' +
+          '<div class="gallery__caption">' +
+            '<span class="gallery__caption-title">' + img.title + '</span>' +
+            '<span class="gallery__caption-author">' + img.author + '</span>' +
+          '</div>';
+
+        // Play on hover
+        var videoEl = item.querySelector('video');
+        item.addEventListener('mouseenter', function () {
+          videoEl.play().catch(function () {});
+        });
+        item.addEventListener('mouseleave', function () {
+          videoEl.pause();
+          videoEl.currentTime = 0;
+        });
+      } else {
+        item.innerHTML =
+          '<div class="gallery__img-wrap">' +
+            '<img data-src="' + img.thumb + '" data-full="' + img.full + '" alt="' + img.alt + '" class="gallery__img" decoding="async">' +
+          '</div>' +
+          '<div class="gallery__caption">' +
+            '<span class="gallery__caption-title">' + img.title + '</span>' +
+            '<span class="gallery__caption-author">' + img.author + '</span>' +
+          '</div>';
+
+        // Lazy load
+        var imgEl = item.querySelector('.gallery__img');
+        lazyLoad(imgEl);
+      }
+
       galleryEl.appendChild(item);
     });
 
@@ -294,10 +386,12 @@
 
     // Listen for image loads to recalculate spans
     galleryEl.querySelectorAll('.gallery__img').forEach(function (imgEl) {
-      imgEl.addEventListener('load', function () {
-        var item = imgEl.closest('.gallery__item');
-        if (item) setRowSpan(item, imgEl);
-      }, { once: true });
+      if (imgEl.tagName === 'IMG') {
+        imgEl.addEventListener('load', function () {
+          var item = imgEl.closest('.gallery__item');
+          if (item) setRowSpan(item, imgEl);
+        }, { once: true });
+      }
     });
   }
 
@@ -307,7 +401,7 @@
     galleryEl.querySelectorAll('.gallery__item').forEach(function (item) {
       if (item.style.display === 'none') return;
       var img = item.querySelector('.gallery__img');
-      if (!img) return;
+      if (!img || img.tagName !== 'IMG') return;
       if (img.naturalWidth && img.naturalHeight) {
         setRowSpan(item, img);
       }
@@ -333,13 +427,11 @@
     if (category === currentCategory) return;
     currentCategory = category;
 
-    // Update nav active state
     document.querySelectorAll('.nav-link').forEach(function (link) {
       link.classList.toggle('active', link.getAttribute('data-category') === category);
     });
 
     if (category === 'all') {
-      // Show slideshow
       window.TumbuktuAnimations.transitionGallery(function () {
         disableSlideshow();
         enableSlideshow();
@@ -384,7 +476,7 @@
   }
 
   // ============================================
-  // FULLSCREEN VIEWER
+  // FULLSCREEN VIEWER (images + video)
   // ============================================
 
   function openViewerFromSlideshow(idx) {
@@ -405,13 +497,37 @@
     viewerOpen = false;
     viewer.classList.remove('viewer--open');
     document.body.style.overflow = '';
+    // Pause viewer video if playing
+    if (viewerVideo) {
+      viewerVideo.pause();
+      viewerVideo.style.display = 'none';
+    }
+    if (viewerImg) {
+      viewerImg.style.display = '';
+    }
   }
 
   function showCurrentImage() {
     var img = viewerItems[viewerIndex];
     if (!img) return;
-    viewerImg.setAttribute('src', img.full);
-    viewerImg.setAttribute('alt', img.alt);
+
+    if (img.type === 'video' && img.src) {
+      // Show video in viewer
+      viewerImg.style.display = 'none';
+      viewerVideo.style.display = 'block';
+      viewerVideo.src = img.src;
+      viewerVideo.play().catch(function () {});
+    } else {
+      // Show image in viewer
+      if (viewerVideo) {
+        viewerVideo.pause();
+        viewerVideo.style.display = 'none';
+      }
+      viewerImg.style.display = '';
+      viewerImg.setAttribute('src', img.full);
+      viewerImg.setAttribute('alt', img.alt);
+    }
+
     viewerCaptionTitle.textContent = img.title || '';
     viewerCaptionAuthor.textContent = img.author || '';
     viewerCurrentEl.textContent = viewerIndex + 1;
@@ -429,12 +545,17 @@
   }
 
   function transitionViewerImage() {
-    viewerImg.style.opacity = '0';
-    viewerImg.style.transform = 'scale(0.95)';
+    // Pause current video before transition
+    if (viewerVideo) viewerVideo.pause();
+
+    var activeEl = viewerItems[viewerIndex] && viewerItems[viewerIndex].type === 'video' ? viewerVideo : viewerImg;
+    activeEl.style.opacity = '0';
+    activeEl.style.transform = 'scale(0.95)';
     setTimeout(function () {
       showCurrentImage();
-      viewerImg.style.opacity = '1';
-      viewerImg.style.transform = 'scale(1)';
+      activeEl = viewerItems[viewerIndex] && viewerItems[viewerIndex].type === 'video' ? viewerVideo : viewerImg;
+      activeEl.style.opacity = '1';
+      activeEl.style.transform = 'scale(1)';
     }, 200);
   }
 
@@ -464,7 +585,7 @@
       nextImage();
     });
 
-    // Keyboard — works for both slideshow and viewer
+    // Keyboard
     document.addEventListener('keydown', function (e) {
       if (viewerOpen) {
         if (e.key === 'Escape') closeViewer();
@@ -472,7 +593,6 @@
         if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevImage();
         return;
       }
-      // Slideshow keyboard nav
       if (slideshowActive) {
         if (e.key === 'ArrowRight') nextSlide();
         if (e.key === 'ArrowLeft') prevSlide();

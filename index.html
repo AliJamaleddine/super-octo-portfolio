@@ -23,7 +23,7 @@
        ============================================ -->
   <div id="loader" class="loader">
     <div class="loader__video-wrap">
-      <video id="loader-video" class="loader__video" autoplay loop playsinline>
+      <video id="loader-video" class="loader__video" autoplay muted loop playsinline>
         <source src="media/loading-video.mp4" type="video/mp4">
       </video>
     </div>
@@ -77,11 +77,11 @@
         <nav id="main-nav" class="sidebar__nav">
           <ul>
             <li><a href="#" class="nav-link active" data-category="all" data-preview="">All Work</a></li>
-            <li><a href="#" class="nav-link" data-category="portraits" data-preview="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=60">Portraits</a></li>
-            <li><a href="#" class="nav-link" data-category="travel" data-preview="https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=800&q=60">Travel</a></li>
-            <li><a href="#" class="nav-link" data-category="night" data-preview="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=800&q=60">Night</a></li>
-            <li><a href="#" class="nav-link" data-category="diary" data-preview="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=60">Diary</a></li>
-            <li><a href="#" class="nav-link" data-category="video" data-preview="https://images.unsplash.com/photo-1536240478700-b869070f9279?w=800&q=60">Video</a></li>
+            <li><a href="#" class="nav-link" data-category="portraits" data-preview="pics/000074650009.JPG">Portraits</a></li>
+            <li><a href="#" class="nav-link" data-category="travel" data-preview="pics/000048220005.jpg">Travel</a></li>
+            <li><a href="#" class="nav-link" data-category="night" data-preview="pics/000074660006.JPG">Night</a></li>
+            <li><a href="#" class="nav-link" data-category="diary" data-preview="pics/000061030033.jpg">Diary</a></li>
+            <li><a href="#" class="nav-link" data-category="video" data-preview="pics/000074660006.JPG">Video</a></li>
             <li><a href="#" class="nav-link" data-category="about" data-preview="">About</a></li>
           </ul>
         </nav>
@@ -155,6 +155,7 @@
     <div class="viewer__backdrop"></div>
     <div class="viewer__img-wrap">
       <img id="viewer-img" class="viewer__img" src="" alt="">
+      <video id="viewer-video" class="viewer__img viewer__video" controls playsinline style="display:none"></video>
     </div>
     <div class="viewer__caption">
       <span id="viewer-caption-title" class="viewer__caption-title"></span>

@@ -35,37 +35,25 @@
     var video = document.getElementById('loader-video');
     if (!video) return;
 
-    // Try autoplay with sound first
-    video.muted = false;
+    // Video starts muted (HTML attribute) for guaranteed autoplay.
+    // On first user interaction, unmute and fade sound in.
     video.volume = 0;
-    var playPromise = video.play();
 
-    if (playPromise !== undefined) {
-      playPromise.then(function () {
-        // Autoplay with sound succeeded — fade volume in
-        fadeVolumeIn(video);
-      }).catch(function () {
-        // Autoplay with sound blocked — start muted, unmute on interaction
-        video.muted = true;
-        video.volume = 0;
-        video.play();
+    var unmuted = false;
+    var unmute = function () {
+      if (unmuted) return;
+      unmuted = true;
+      video.muted = false;
+      video.volume = 0;
+      fadeVolumeIn(video);
+      document.removeEventListener('click', unmute);
+      document.removeEventListener('touchstart', unmute);
+      document.removeEventListener('wheel', unmute);
+    };
 
-        var unmute = function () {
-          video.muted = false;
-          video.volume = 0;
-          fadeVolumeIn(video);
-          document.removeEventListener('click', unmute);
-          document.removeEventListener('scroll', unmute);
-          document.removeEventListener('touchstart', unmute);
-          document.removeEventListener('wheel', unmute);
-        };
-
-        document.addEventListener('click', unmute, { once: false });
-        document.addEventListener('scroll', unmute, { once: false });
-        document.addEventListener('touchstart', unmute, { once: false });
-        document.addEventListener('wheel', unmute, { once: false });
-      });
-    }
+    document.addEventListener('click', unmute);
+    document.addEventListener('touchstart', unmute);
+    document.addEventListener('wheel', unmute);
   }
 
   function fadeVolumeIn(video) {

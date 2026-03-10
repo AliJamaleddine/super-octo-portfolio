@@ -4,22 +4,22 @@
 
    HOW TO ADD NEW PHOTOS:
 
-   1. Place your thumbnail in:  media/thumbnails/<category>/filename.jpg
-      (recommended: ~600–800px wide, quality 75)
+   1. Place your image in:  pics/filename.jpg
 
-   2. Place the full-res in:    media/images/<category>/filename.jpg
-      (recommended: ~2400px wide, quality 90)
-
-   3. Add an entry to the matching array below.
+   2. Add an entry to the matching array below.
 
    Categories: portraits, travel, night, diary, video
 
    Each entry requires:
-     thumb  — path to gallery thumbnail
+     thumb  — path to image (same file, browser handles sizing)
      full   — path to full-resolution image
      alt    — accessible description
      title  — location + year shown in caption
      author — subject or series name shown in caption
+
+   For video entries, add:
+     type   — 'video'
+     src    — path to the video file
 
    The gallery reads from this file automatically.
    No need to edit index.html.
@@ -29,121 +29,167 @@ window.GALLERY_DATA = {
 
   portraits: [
     {
-      thumb:  'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=2400&q=90',
-      alt:    'Portrait in natural light',
-      title:  'Lagos — 2024',
-      author: 'Amara'
+      thumb:  'pics/000074650009.JPG',
+      full:   'pics/000074650009.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film I'
     },
     {
-      thumb:  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=2400&q=90',
-      alt:    'Studio portrait',
-      title:  'London — 2024',
-      author: 'Zara'
+      thumb:  'pics/000074650013.JPG',
+      full:   'pics/000074650013.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film II'
     },
     {
-      thumb:  'https://images.unsplash.com/photo-1504703395950-b89145a5425b?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1504703395950-b89145a5425b?w=2400&q=90',
-      alt:    'Portrait outdoors',
-      title:  'Rio — 2024',
-      author: 'Matheus'
+      thumb:  'pics/000074650015.JPG',
+      full:   'pics/000074650015.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film III'
     },
     {
-      thumb:  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=2400&q=90',
-      alt:    'Male portrait',
-      title:  'Accra — 2024',
-      author: 'Kwame'
+      thumb:  'pics/000074650016.JPG',
+      full:   'pics/000074650016.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film IV'
+    },
+    {
+      thumb:  'pics/000074650024.JPG',
+      full:   'pics/000074650024.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film V'
+    },
+    {
+      thumb:  'pics/000074650025.JPG',
+      full:   'pics/000074650025.JPG',
+      alt:    'Portrait on film',
+      title:  '2025',
+      author: 'Film VI'
     }
   ],
 
   travel: [
     {
-      thumb:  'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=2400&q=90',
-      alt:    'Ocean sunset',
-      title:  'Bali — 2024',
-      author: 'Horizon'
+      thumb:  'pics/000048220005.jpg',
+      full:   'pics/000048220005.jpg',
+      alt:    'Travel photograph',
+      title:  '2025',
+      author: 'Journey I'
     },
     {
-      thumb:  'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=2400&q=90',
-      alt:    'Desert landscape',
-      title:  'Sahara — 2023',
-      author: 'Dunes'
+      thumb:  'pics/000048220010.jpg',
+      full:   'pics/000048220010.jpg',
+      alt:    'Travel photograph',
+      title:  '2025',
+      author: 'Journey II'
     },
     {
-      thumb:  'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=2400&q=90',
-      alt:    'Forest light',
-      title:  'Kyoto — 2023',
-      author: 'Bamboo'
+      thumb:  'pics/000048220014.jpg',
+      full:   'pics/000048220014.jpg',
+      alt:    'Travel photograph',
+      title:  '2025',
+      author: 'Journey III'
     },
     {
-      thumb:  'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=2400&q=90',
-      alt:    'Mountain lake',
-      title:  'Patagonia — 2023',
-      author: 'Glaciar'
+      thumb:  'pics/000048220036.jpg',
+      full:   'pics/000048220036.jpg',
+      alt:    'Travel photograph',
+      title:  '2025',
+      author: 'Journey IV'
     }
   ],
 
   night: [
     {
-      thumb:  'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=2400&q=90',
-      alt:    'City at night',
-      title:  'Tokyo — 2024',
-      author: 'Neon'
+      thumb:  'pics/000074660006.JPG',
+      full:   'pics/000074660006.JPG',
+      alt:    'Night photograph',
+      title:  '2025',
+      author: 'Night I'
     },
     {
-      thumb:  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=2400&q=90',
-      alt:    'Night mountains',
-      title:  'Alps — 2023',
-      author: 'Starfield'
+      thumb:  'pics/000074660017.JPG',
+      full:   'pics/000074660017.JPG',
+      alt:    'Night photograph',
+      title:  '2025',
+      author: 'Night II'
     },
     {
-      thumb:  'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=2400&q=90',
-      alt:    'Golden hour',
-      title:  'Marrakech — 2024',
-      author: 'Glow'
+      thumb:  'pics/000074660018.JPG',
+      full:   'pics/000074660018.JPG',
+      alt:    'Night photograph',
+      title:  '2025',
+      author: 'Night III'
+    },
+    {
+      thumb:  'pics/000074660022.JPG',
+      full:   'pics/000074660022.JPG',
+      alt:    'Night photograph',
+      title:  '2025',
+      author: 'Night IV'
     }
   ],
 
   diary: [
     {
-      thumb:  'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=2400&q=90',
-      alt:    'Concert moment',
-      title:  'Berlin — 2023',
-      author: 'Echoes'
+      thumb:  'pics/000061030033.jpg',
+      full:   'pics/000061030033.jpg',
+      alt:    'Diary moment',
+      title:  '2025',
+      author: 'Diary I'
     },
     {
-      thumb:  'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=2400&q=90',
-      alt:    'Candid diary',
-      title:  'NYC — 2024',
-      author: 'Streets'
+      thumb:  'pics/000061030042 copie.jpg',
+      full:   'pics/000061030042 copie.jpg',
+      alt:    'Diary moment',
+      title:  '2025',
+      author: 'Diary II'
     },
     {
-      thumb:  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=2400&q=90',
-      alt:    'Candid moment',
-      title:  'Lisbon — 2023',
-      author: 'Maria'
+      thumb:  'pics/000073510009.jpg',
+      full:   'pics/000073510009.jpg',
+      alt:    'Diary moment',
+      title:  '2025',
+      author: 'Diary III'
+    },
+    {
+      thumb:  'pics/1752100091936.739.JPG',
+      full:   'pics/1752100091936.739.JPG',
+      alt:    'Diary moment',
+      title:  '2026',
+      author: 'Diary IV'
+    },
+    {
+      thumb:  'pics/P6290934.JPG',
+      full:   'pics/P6290934.JPG',
+      alt:    'Diary moment',
+      title:  '2025',
+      author: 'Diary V'
     }
   ],
 
   video: [
     {
-      thumb:  'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=600&q=75',
-      full:   'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=2400&q=90',
-      alt:    'Film production',
-      title:  'Lagos — 2024',
-      author: 'BTS'
+      type:   'video',
+      src:    'pics/GX010905.MP4',
+      thumb:  'pics/000074650009.JPG',
+      full:   'pics/000074650009.JPG',
+      alt:    'Video — GoPro footage',
+      title:  '2025',
+      author: 'GoPro'
+    },
+    {
+      type:   'video',
+      src:    'pics/hf_20260309_193238_1f824481-169c-4d37-9c75-c6ae95d9d4eb.mp4',
+      thumb:  'pics/000074660006.JPG',
+      full:   'pics/000074660006.JPG',
+      alt:    'Video — Short film',
+      title:  '2026',
+      author: 'Short Film'
     }
   ]
 
