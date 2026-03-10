@@ -201,13 +201,17 @@
     });
   }
 
-  // --- Nav Image Preview (background) ---
+  // --- Nav Image Preview (background — desktop only) ---
   function initNavPreview() {
+    // Skip on touch/mobile devices — hover preview doesn't make sense
+    if (window.innerWidth <= 768) return;
+
     var preview = document.getElementById('nav-preview');
     var navLinks = document.querySelectorAll('.nav-link[data-preview]');
 
     navLinks.forEach(function (link) {
       link.addEventListener('mouseenter', function () {
+        if (window.innerWidth <= 768) return;
         var src = this.getAttribute('data-preview');
         if (src) {
           preview.style.backgroundImage = 'url(' + src + ')';
@@ -266,12 +270,14 @@
       toggle.classList.add('menu-toggle--active');
       sidebar.classList.add('sidebar--open');
       overlay.classList.add('mobile-overlay--visible');
+      document.body.classList.add('menu-open');
     }
 
     function closeMenu() {
       toggle.classList.remove('menu-toggle--active');
       sidebar.classList.remove('sidebar--open');
       overlay.classList.remove('mobile-overlay--visible');
+      document.body.classList.remove('menu-open');
     }
 
     toggle.addEventListener('click', function () {
@@ -284,6 +290,7 @@
 
     overlay.addEventListener('click', closeMenu);
 
+    // Close menu when a nav link is tapped
     document.querySelectorAll('.nav-link').forEach(function (link) {
       link.addEventListener('click', function () {
         if (window.innerWidth <= 768) {
@@ -291,6 +298,16 @@
         }
       });
     });
+
+    // Close menu when logo is tapped on mobile
+    var logo = document.querySelector('.sidebar__logo');
+    if (logo) {
+      logo.addEventListener('click', function () {
+        if (window.innerWidth <= 768) {
+          closeMenu();
+        }
+      });
+    }
   }
 
   // --- Init Everything ---
