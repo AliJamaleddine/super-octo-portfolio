@@ -830,6 +830,11 @@ html.lenis, html.lenis body {
     letter-spacing: 0.12em;
   }
 
+  /* Remove stacking context from .site so sidebar z-index works in root context */
+  .site {
+    z-index: auto;
+  }
+
   /* Sidebar — slide-in panel */
   .sidebar {
     width: 280px;
@@ -915,14 +920,13 @@ html.lenis, html.lenis body {
 
   .slideshow__slide {
     width: 90vw;
-    /* No scale effect on mobile — keep all slides same size for cleaner swiping */
     opacity: 0.35;
-    transform: scale(0.95);
+    transform: none;
   }
 
   .slideshow__slide--active {
     opacity: 1;
-    transform: scale(1);
+    transform: none;
   }
 
   .slideshow__img {
