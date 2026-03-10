@@ -28,29 +28,19 @@
   }
 
   // ============================================
-  // INTRO VIDEO — autoplay + optional sound (desktop only)
+  // INTRO VIDEO — sound control (desktop only)
   // ============================================
 
-  var fadeInterval = null;  // track the volume fade setInterval
+  var fadeInterval = null;
 
   function initVideoSound() {
     var video = document.getElementById('loader-video');
     if (!video) return;
 
-    // Ensure autoplay works on mobile — explicit play() fallback
-    video.play().catch(function () {
-      // Autoplay blocked — try again on first interaction
-      var tryPlay = function () {
-        video.play().catch(function () {});
-        document.removeEventListener('touchstart', tryPlay);
-        document.removeEventListener('click', tryPlay);
-      };
-      document.addEventListener('touchstart', tryPlay, { once: true });
-      document.addEventListener('click', tryPlay, { once: true });
-    });
+    // The HTML autoplay+muted+playsinline attributes handle autoplay on all browsers.
+    // Do NOT call video.play() here — it can interfere with the native autoplay.
 
     // On mobile, keep the video muted — no sound interaction
-    // Mobile browsers are restrictive about audio and the looping sound is disruptive
     if (window.innerWidth <= 768) return;
 
     // Desktop only: unmute on first interaction and fade sound in
