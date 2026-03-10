@@ -28,15 +28,32 @@
   }
 
   // ============================================
-  // INTRO VIDEO SOUND — fade in on interaction
+  // INTRO VIDEO — autoplay + optional sound (desktop only)
   // ============================================
+
+  var fadeInterval = null;  // track the volume fade setInterval
 
   function initVideoSound() {
     var video = document.getElementById('loader-video');
     if (!video) return;
 
-    // Video starts muted (HTML attribute) for guaranteed autoplay.
-    // On first user interaction, unmute and fade sound in.
+    // Ensure autoplay works on mobile — explicit play() fallback
+    video.play().catch(function () {
+      // Autoplay blocked — try again on first interaction
+      var tryPlay = function () {
+        video.play().catch(function () {});
+        document.removeEventListener('touchstart', tryPlay);
+        document.removeEventListener('click', tryPlay);
+      };
+      document.addEventListener('touchstart', tryPlay, { once: true });
+      document.addEventListener('click', tryPlay, { once: true });
+    });
+
+    // On mobile, keep the video muted — no sound interaction
+    // Mobile browsers are restrictive about audio and the looping sound is disruptive
+    if (window.innerWidth <= 768) return;
+
+    // Desktop only: unmute on first interaction and fade sound in
     video.volume = 0;
 
     var unmuted = false;
@@ -47,28 +64,30 @@
       video.volume = 0;
       fadeVolumeIn(video);
       document.removeEventListener('click', unmute);
-      document.removeEventListener('touchstart', unmute);
       document.removeEventListener('wheel', unmute);
     };
 
     document.addEventListener('click', unmute);
-    document.addEventListener('touchstart', unmute);
     document.addEventListener('wheel', unmute);
   }
 
   function fadeVolumeIn(video) {
-    var target = 0.35;  // subtle background volume
-    var duration = 1500; // 1.5 seconds
+    var target = 0.35;
+    var duration = 1500;
     var steps = 30;
     var stepTime = duration / steps;
     var increment = target / steps;
     var current = 0;
 
-    var interval = setInterval(function () {
+    // Clear any previous interval
+    if (fadeInterval) clearInterval(fadeInterval);
+
+    fadeInterval = setInterval(function () {
       current += increment;
       if (current >= target) {
         video.volume = target;
-        clearInterval(interval);
+        clearInterval(fadeInterval);
+        fadeInterval = null;
       } else {
         video.volume = current;
       }
@@ -122,12 +141,18 @@
     loader.style.pointerEvents = 'none';
     loader.style.display = 'none';
 
-    // Fade out video audio
+    // Stop loader video completely — kill any running fade interval first
+    if (fadeInterval) {
+      clearInterval(fadeInterval);
+      fadeInterval = null;
+    }
     var video = document.getElementById('loader-video');
     if (video) {
-      gsap.to(video, { volume: 0, duration: 0.5, onComplete: function () {
-        video.pause();
-      }});
+      video.muted = true;
+      video.volume = 0;
+      video.pause();
+      video.removeAttribute('src');
+      video.load(); // release the media resource
     }
 
     var site = document.getElementById('site');
